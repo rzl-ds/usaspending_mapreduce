@@ -24,7 +24,7 @@ import csv
 import os
 import sys
 
-from io import StringIO
+from StringIO import StringIO
 
 
 # ----------------------------- #
