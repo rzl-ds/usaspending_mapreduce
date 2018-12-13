@@ -6,9 +6,8 @@ Module: reducer.py
 Created: 2018-12-07
 
 Description:
-    reduce a set of incoming (key, value) pairs to only the most recent value
-    (as determined by the last_modified_date field, the last field in each
-    incoming record)
+    reduce a set of incoming (key, value) to be the key followed by the maximum
+    value
 
 Usage:
 
@@ -22,7 +21,6 @@ Usage:
 
 """
 
-import os
 import sys
 
 from itertools import groupby
@@ -32,8 +30,6 @@ from itertools import groupby
 #   Module Constants            #
 # ----------------------------- #
 
-HERE = os.path.dirname(os.path.realpath(__file__))
-
 
 # ----------------------------- #
 #   key-value emitter           #
@@ -41,9 +37,10 @@ HERE = os.path.dirname(os.path.realpath(__file__))
 
 def reduce():
     """our inputs now are key-value pairs where the key is the two unique ids
-    for a contract and the values are the lines which have those ids. we may get
-    more than one key per run of the reducer so we have to chunk the input up by
-    input key
+    for a contract (as a ','-separated string) and the values are 1 or 0
+    (depending on whether or not an action for that key was a termination). the
+    reducer seeks to find the maximum value (1 if any was a termination, 0 only
+    if none were terminations)
 
     """
     # make an iterator which just splits each incoming row into keys and values
@@ -53,12 +50,27 @@ def reduce():
     grouped_iter = groupby(kvp_iter, key=lambda kvp: kvp[0])
 
     for (key, keyvallist) in grouped_iter:
-        # the keyvallist is a list of elements where each element is the current
-        # key (yes, it's redundant with the key we've already identified in the
-        # `for` statemenet above) and the line
-        max_keyval = max(keyvallist, key=lambda keyval: keyval[1].split(',')[-1])
+        # the grouped_iter above is a little fancy and weird. basically, the
+        # keyvallist is itself a list of elements where each element is a tuple.
+        # the first element of the tuple is the current key (yes, it's redundant
+        # with the key we've already identified in the `for` statemenet above)
+        # and the second element is the value in the original record. this means
+        # that a keyvallist would look like
+        #
+        #   [('award_id_piid,parent_award_id', '0'),
+        #    ('award_id_piid,parent_award_id', '0'),
+        #    ('award_id_piid,parent_award_id', '1'),
+        #    ('award_id_piid,parent_award_id', '0')]
+        #
+        # our goal is to identify the maximum value among the second elements in
+        # this list
+        max_keyval = max(
+            keyvallist,
+            key=lambda keyval: int(keyval[1]))
         _, maxval = max_keyval
-        print(maxval)
+
+        # emit a string that is award_id_piid,parent_award_id,maxval
+        print('{},{}'.format(key, maxval))
 
 
 if __name__ == '__main__':
