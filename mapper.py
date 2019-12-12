@@ -29,10 +29,10 @@ import sys
 #   Module Constants            #
 # ----------------------------- #
 
-AWARD_ID_PIID = 0
-PARENT_AWARD_ID = 3
-ACTION_TYPE = 72
-RECORD_LENGTH = 261
+AWARD_ID_PIID = 2
+PARENT_AWARD_ID = 7
+ACTION_TYPE = 78
+RECORD_LENGTH = 277
 
 BAD_ACTION_TYPES = [
     'TERMINATE FOR DEFAULT (COMPLETE OR PARTIAL)',
@@ -46,10 +46,10 @@ BAD_ACTION_TYPES = [
 
 def map():
     """our mapper is very simple. we will start by attempting to parse every
-    line into a 261 element list. we will then emit key-value pairs where the
+    line into a 277 element list. we will then emit key-value pairs where the
     keys are the 0th and 3rd elements (the `award_id_piid` and
     `parent_award_id`, respectively), and the value is a boolean (0, 1)
-    indicating whether or not that record's `action_type` (element 72) was of a
+    indicating whether or not that record's `action_type` (element 77) was of a
     "bad" type (1 if it is a bad type, 0 if it is not)
 
     """
