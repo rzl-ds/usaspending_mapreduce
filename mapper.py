@@ -7,7 +7,7 @@ Created: 2018-12-07
 
 Description:
     map a line in usaspending csvs to a key-value pair with
-    (parent_award_id, award_id_piid) as key and a boolean (0, 1) indicating
+    (parent_award_id_piid, award_id_piid) as key and a boolean (0, 1) indicating
     whether or not that line is a termination action as the value
 
 Usage:
@@ -30,7 +30,7 @@ import sys
 # ----------------------------- #
 
 AWARD_ID_PIID = 2
-PARENT_AWARD_ID = 7
+PARENT_AWARD_ID_PIID = 7
 ACTION_TYPE = 78
 RECORD_LENGTH = 277
 
@@ -48,7 +48,7 @@ def map():
     """our mapper is very simple. we will start by attempting to parse every
     line into a 277 element list. we will then emit key-value pairs where the
     keys are the 0th and 3rd elements (the `award_id_piid` and
-    `parent_award_id`, respectively), and the value is a boolean (0, 1)
+    `parent_award_id_piid`, respectively), and the value is a boolean (0, 1)
     indicating whether or not that record's `action_type` (element 77) was of a
     "bad" type (1 if it is a bad type, 0 if it is not)
 
@@ -69,8 +69,8 @@ def map():
         if len(rec) != RECORD_LENGTH:
             continue
 
-        # the key is the tuple of award_id_piid and parent_award_id
-        key = rec[AWARD_ID_PIID], rec[PARENT_AWARD_ID]
+        # the key is the tuple of award_id_piid and parent_award_id_piid
+        key = rec[AWARD_ID_PIID], rec[PARENT_AWARD_ID_PIID]
 
         # the value is a boolean on the action_type
         value = int(rec[ACTION_TYPE] in BAD_ACTION_TYPES)
